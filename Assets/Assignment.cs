@@ -6,6 +6,7 @@ Pixel RPG characters created by Sean Browning.
 
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 
@@ -75,10 +76,29 @@ static public class AssignmentPart1
 
     static public void SavePartyButtonPressed()
     {
+        StreamWriter File = new StreamWriter("Save File.txt");
+        
+
         foreach (PartyCharacter pc in GameContent.partyCharacters)
         {
+            File.WriteLine(pc.classID.ToString());
+            File.WriteLine(pc.health.ToString());
+            File.WriteLine(pc.mana.ToString());
+            File.WriteLine(pc.strength.ToString());
+            File.WriteLine(pc.agility.ToString());
+            File.WriteLine(pc.wisdom.ToString());
+            int count = pc.equipment.Count;
+            for (int i = 0; i < count; i++)
+            {
+                File.WriteLine(pc.equipment.First.Value);
+                pc.equipment.RemoveFirst();
+
+            }
+            File.WriteLine("-");
             Debug.Log("PC class id == " + pc.classID);
+
         }
+        File.Close();
     }
 
     static public void LoadPartyButtonPressed()
