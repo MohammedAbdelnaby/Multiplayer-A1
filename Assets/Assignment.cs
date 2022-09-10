@@ -4,6 +4,7 @@ This RPG data streaming assignment was created by Fernando Restituto.
 Pixel RPG characters created by Sean Browning.
 */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -77,24 +78,22 @@ static public class AssignmentPart1
     static public void SavePartyButtonPressed()
     {
         StreamWriter File = new StreamWriter("Save File.txt");
-        
 
+
+        //File.WriteLine(GameContent.partyCharacters.Count);
+        //File.WriteLine("-");
         foreach (PartyCharacter pc in GameContent.partyCharacters)
         {
-            File.WriteLine(pc.classID.ToString());
-            File.WriteLine(pc.health.ToString());
-            File.WriteLine(pc.mana.ToString());
-            File.WriteLine(pc.strength.ToString());
-            File.WriteLine(pc.agility.ToString());
-            File.WriteLine(pc.wisdom.ToString());
+            File.Write(pc.classID.ToString() + "," + pc.health.ToString() + "," + pc.mana.ToString() +"," + pc.strength.ToString() + "," + pc.agility.ToString() + "," + pc.wisdom.ToString() + ",");
             int count = pc.equipment.Count;
             for (int i = 0; i < count; i++)
             {
-                File.WriteLine(pc.equipment.First.Value);
+                File.Write(pc.equipment.First.Value);
+                File.Write(",");
                 pc.equipment.RemoveFirst();
 
             }
-            File.WriteLine("-");
+            File.WriteLine();
             Debug.Log("PC class id == " + pc.classID);
 
         }
@@ -104,7 +103,32 @@ static public class AssignmentPart1
     static public void LoadPartyButtonPressed()
     {
 
-        //GameContent.partyCharacters.Clear();
+        GameContent.partyCharacters.Clear();
+
+        GameContent.partyCharacters = new LinkedList<PartyCharacter>();
+
+        string[] lines = System.IO.File.ReadAllLines(@"E:\Unity\Multiplayer-A1\Multiplayer-A1\Save File.txt");
+        foreach (string line in lines)
+        {
+            PartyCharacter pc = new PartyCharacter();
+            GameContent.partyCharacters.AddLast(pc);
+            string[] stats = line.Split(',');
+            pc.classID = Convert.ToInt32(stats[0]);
+            pc.health = Convert.ToInt32(stats[1]);
+            pc.mana = Convert.ToInt32(stats[2]);
+            pc.strength = Convert.ToInt32(stats[3]);
+            pc.agility = Convert.ToInt32(stats[4]);
+            pc.wisdom = Convert.ToInt32(stats[5]);
+            for (int i = 6; i < stats.Length; i++)
+            {
+                if (i < 0 || stats[i] == "")
+                {
+                    break;
+                }
+                pc.equipment.AddFirst(Convert.ToInt32(stats[i]));
+            }
+
+        }
 
         GameContent.RefreshUI();
 
