@@ -79,13 +79,12 @@ static public class AssignmentPart1
     {
         StreamWriter File = new StreamWriter("Save File.txt");
 
-
-        //File.WriteLine(GameContent.partyCharacters.Count);
-        //File.WriteLine("-");
         foreach (PartyCharacter pc in GameContent.partyCharacters)
         {
+            // writing all the player stats in one line so we would be easier read and the "," will be splitting the stats
             File.Write(pc.classID.ToString() + "," + pc.health.ToString() + "," + pc.mana.ToString() +"," + pc.strength.ToString() + "," + pc.agility.ToString() + "," + pc.wisdom.ToString() + ",");
             int count = pc.equipment.Count;
+            //writes the players equipment on the same line as the stats
             for (int i = 0; i < count; i++)
             {
                 File.Write(pc.equipment.First.Value);
@@ -93,6 +92,7 @@ static public class AssignmentPart1
                 pc.equipment.RemoveFirst();
 
             }
+            //new line for the next player
             File.WriteLine();
             Debug.Log("PC class id == " + pc.classID);
 
@@ -107,11 +107,14 @@ static public class AssignmentPart1
 
         GameContent.partyCharacters = new LinkedList<PartyCharacter>();
 
+
         string[] lines = System.IO.File.ReadAllLines(@"E:\Unity\Multiplayer-A1\Multiplayer-A1\Save File.txt");
+        //each line is a player stats
         foreach (string line in lines)
         {
             PartyCharacter pc = new PartyCharacter();
             GameContent.partyCharacters.AddLast(pc);
+            //splits the player stats in a array ("1,2,3,4,5,.." -> ["1", "2", "3", ...])
             string[] stats = line.Split(',');
             pc.classID = Convert.ToInt32(stats[0]);
             pc.health = Convert.ToInt32(stats[1]);
@@ -119,9 +122,11 @@ static public class AssignmentPart1
             pc.strength = Convert.ToInt32(stats[3]);
             pc.agility = Convert.ToInt32(stats[4]);
             pc.wisdom = Convert.ToInt32(stats[5]);
+            // there is 6 stats so the rest will be equipment so i start a loop at 6th spot of the array
             for (int i = 6; i < stats.Length; i++)
             {
-                if (i < 0 || stats[i] == "")
+                //at the end of the stats line is "," and when slip it will be come "" so adding "" to equipment will crash the code
+                if (stats[i] == "")
                 {
                     break;
                 }
