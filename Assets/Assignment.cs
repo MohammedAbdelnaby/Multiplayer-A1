@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 #region Assignment Instructions
@@ -153,7 +154,7 @@ static public class AssignmentPart1
 //  This will enable the needed UI/function calls for your to proceed with your assignment.
 static public class AssignmentConfiguration
 {
-    public const int PartOfAssignmentThatIsInDevelopment = 1;
+    public const int PartOfAssignmentThatIsInDevelopment = 2;
 }
 
 /*
@@ -191,22 +192,21 @@ Good luck, journey well.
 
 static public class AssignmentPart2
 {
-
     static public void GameStart()
     {
-
         GameContent.RefreshUI();
 
     }
 
     static public List<string> GetListOfPartyNames()
     {
-        return new List<string>() {
-            "sample 1",
-            "sample 2",
-            "sample 3"
-        };
-
+        string[] lines = System.IO.File.ReadAllLines(@"E:\Unity\Multiplayer-A1\Multiplayer-A1\Names.txt");
+        List<string> Names = new List<string>();
+        foreach (string line in lines)
+        {
+            Names.Add(line);
+        }
+        return Names;
     }
 
     static public void LoadPartyDropDownChanged(string selectedName)
@@ -216,6 +216,31 @@ static public class AssignmentPart2
 
     static public void SavePartyButtonPressed()
     {
+        InputField Partytext = GameObject.FindObjectOfType<InputField>();
+        StreamWriter FileNames = new StreamWriter("Names.txt", true);
+        FileNames.WriteLine(Partytext.text);
+        FileNames.Close();
+        StreamWriter File = new StreamWriter(Partytext.text+".txt");
+        Debug.Log(Partytext.text + ".txt");
+        foreach (PartyCharacter pc in GameContent.partyCharacters)
+        {
+            // writing all the player stats in one line so we would be easier read and the "," will be splitting the stats
+            File.Write(pc.classID.ToString() + "," + pc.health.ToString() + "," + pc.mana.ToString() + "," + pc.strength.ToString() + "," + pc.agility.ToString() + "," + pc.wisdom.ToString() + ",");
+            int count = pc.equipment.Count;
+            //writes the players equipment on the same line as the stats
+            for (int i = 0; i < count; i++)
+            {
+                File.Write(pc.equipment.First.Value);
+                File.Write(",");
+                pc.equipment.RemoveFirst();
+
+            }
+            //new line for the next player
+            File.WriteLine();
+            Debug.Log("PC class id == " + pc.classID);
+
+        }
+        File.Close();
         GameContent.RefreshUI();
     }
 
