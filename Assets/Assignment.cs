@@ -109,10 +109,11 @@ static public class AssignmentPart1
         GameContent.partyCharacters = new LinkedList<PartyCharacter>();
 
 
-        string[] lines = System.IO.File.ReadAllLines(@"E:\Unity\Multiplayer-A1\Multiplayer-A1\Save File.txt");
+        string[] lines = System.IO.File.ReadAllLines(@"C:\Users\Mohammed Abdelnaby\source\Unity repo\Multiplayer-A1\Save File.txt");
         //each line is a player stats
         foreach (string line in lines)
         {
+            
             PartyCharacter pc = new PartyCharacter();
             GameContent.partyCharacters.AddLast(pc);
             //splits the player stats in a array ("1,2,3,4,5,.." -> ["1", "2", "3", ...])
@@ -200,8 +201,9 @@ static public class AssignmentPart2
 
     static public List<string> GetListOfPartyNames()
     {
-        string[] lines = System.IO.File.ReadAllLines(@"E:\Unity\Multiplayer-A1\Multiplayer-A1\Names.txt");
+        string[] lines = System.IO.File.ReadAllLines(@"C:\Users\Mohammed Abdelnaby\source\Unity repo\Multiplayer-A1\Names.txt");
         List<string> Names = new List<string>();
+        Names.Add("");
         foreach (string line in lines)
         {
             Names.Add(line);
@@ -211,6 +213,42 @@ static public class AssignmentPart2
 
     static public void LoadPartyDropDownChanged(string selectedName)
     {
+        GameContent.partyCharacters.Clear();
+
+        GameContent.partyCharacters = new LinkedList<PartyCharacter>();
+        if (selectedName == "")
+        {
+            return;
+        }
+
+        string[] lines = System.IO.File.ReadAllLines(@"C:\Users\Mohammed Abdelnaby\source\Unity repo\Multiplayer-A1\" + selectedName + ".txt");
+        //each line is a player stats
+        foreach (string line in lines)
+        {
+
+            PartyCharacter pc = new PartyCharacter();
+            GameContent.partyCharacters.AddLast(pc);
+            //splits the player stats in a array ("1,2,3,4,5,.." -> ["1", "2", "3", ...])
+            string[] stats = line.Split(',');
+            pc.classID = Convert.ToInt32(stats[0]);
+            pc.health = Convert.ToInt32(stats[1]);
+            pc.mana = Convert.ToInt32(stats[2]);
+            pc.strength = Convert.ToInt32(stats[3]);
+            pc.agility = Convert.ToInt32(stats[4]);
+            pc.wisdom = Convert.ToInt32(stats[5]);
+            // there is 6 stats so the rest will be equipment so i start a loop at 6th spot of the array
+            for (int i = 6; i < stats.Length; i++)
+            {
+                //at the end of the stats line is "," and when slip it will be come "" so adding "" to equipment will crash the code
+                if (stats[i] == "")
+                {
+                    break;
+                }
+                pc.equipment.AddFirst(Convert.ToInt32(stats[i]));
+            }
+
+        }
+
         GameContent.RefreshUI();
     }
 
@@ -218,10 +256,15 @@ static public class AssignmentPart2
     {
         InputField Partytext = GameObject.FindObjectOfType<InputField>();
         StreamWriter FileNames = new StreamWriter("Names.txt", true);
+        if (!IsAllLetters(Partytext.text))
+        {
+            Debug.Log("Only letters");
+            FileNames.Close();
+            return;
+        }
         FileNames.WriteLine(Partytext.text);
         FileNames.Close();
-        StreamWriter File = new StreamWriter(Partytext.text+".txt");
-        Debug.Log(Partytext.text + ".txt");
+        StreamWriter File = new StreamWriter(Partytext.text+".txt", true);
         foreach (PartyCharacter pc in GameContent.partyCharacters)
         {
             // writing all the player stats in one line so we would be easier read and the "," will be splitting the stats
@@ -251,10 +294,41 @@ static public class AssignmentPart2
 
     static public void DeletePartyButtonPressed()
     {
+        Text Partytext = GameObject.FindObjectOfType<Dropdown>().GetComponentInChildren<Text>();
+        File.Delete(@"C:\Users\Mohammed Abdelnaby\source\Unity repo\Multiplayer-A1\" + Partytext.text + ".txt");
 
+        string[] lines = System.IO.File.ReadAllLines(@"C:\Users\Mohammed Abdelnaby\source\Unity repo\Multiplayer-A1\Names.txt");
+        List<string> Names = new List<string>();
+        foreach (string line in lines)
+        {
+            if(line == Partytext.text)
+            {
+                continue;
+            }
+            Names.Add(line);
+        }
+        File.Delete(@"C:\Users\Mohammed Abdelnaby\source\Unity repo\Multiplayer-A1\Names.txt");
+        StreamWriter FileNames = new StreamWriter("Names.txt");
+        foreach (string name in Names)
+        {
+            FileNames.WriteLine(name);
+        }
+        FileNames.Close();
+        GameContent.RefreshUI();
+    }
+
+    private static bool IsAllLetters(string s)
+    {
+        foreach (char c in s)
+        {
+            if (!Char.IsLetter(c))
+                return false;
+        }
+        return true;
     }
 
 }
+
 
 #endregion
 
