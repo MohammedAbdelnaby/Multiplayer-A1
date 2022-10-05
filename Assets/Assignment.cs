@@ -8,6 +8,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Unity.Mathematics;
+using UnityEditor.Build.Reporting;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -201,7 +204,8 @@ static public class AssignmentPart2
 
     static public List<string> GetListOfPartyNames()
     {
-        string[] lines = System.IO.File.ReadAllLines(@"C:\Users\Mohammed Abdelnaby\source\Unity repo\Multiplayer-A1\Names.txt");
+        var path = Directory.GetCurrentDirectory();
+        string[] lines = System.IO.File.ReadAllLines(path +@"/Names.txt");
         List<string> Names = new List<string>();
         Names.Add("");
         foreach (string line in lines)
@@ -213,6 +217,7 @@ static public class AssignmentPart2
 
     static public void LoadPartyDropDownChanged(string selectedName)
     {
+        var path = Directory.GetCurrentDirectory();
         GameContent.partyCharacters.Clear();
 
         GameContent.partyCharacters = new LinkedList<PartyCharacter>();
@@ -221,7 +226,7 @@ static public class AssignmentPart2
             return;
         }
 
-        string[] lines = System.IO.File.ReadAllLines(@"C:\Users\Mohammed Abdelnaby\source\Unity repo\Multiplayer-A1\" + selectedName + ".txt");
+        string[] lines = System.IO.File.ReadAllLines(path + @"\" + selectedName + ".txt");
         //each line is a player stats
         foreach (string line in lines)
         {
@@ -294,10 +299,11 @@ static public class AssignmentPart2
 
     static public void DeletePartyButtonPressed()
     {
+        var path = Directory.GetCurrentDirectory();
         Text Partytext = GameObject.FindObjectOfType<Dropdown>().GetComponentInChildren<Text>();
-        File.Delete(@"C:\Users\Mohammed Abdelnaby\source\Unity repo\Multiplayer-A1\" + Partytext.text + ".txt");
+        File.Delete(path + @"\" + Partytext.text + ".txt");
 
-        string[] lines = System.IO.File.ReadAllLines(@"C:\Users\Mohammed Abdelnaby\source\Unity repo\Multiplayer-A1\Names.txt");
+        string[] lines = System.IO.File.ReadAllLines(path + @"\Names.txt");
         List<string> Names = new List<string>();
         foreach (string line in lines)
         {
@@ -307,7 +313,7 @@ static public class AssignmentPart2
             }
             Names.Add(line);
         }
-        File.Delete(@"C:\Users\Mohammed Abdelnaby\source\Unity repo\Multiplayer-A1\Names.txt");
+        File.Delete(path + @"\Names.txt");
         StreamWriter FileNames = new StreamWriter("Names.txt");
         foreach (string name in Names)
         {
